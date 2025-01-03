@@ -61,4 +61,8 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.auth)
+
+    implementation(libs.androidx.navigation.compose)
+
 }
