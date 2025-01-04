@@ -5,4 +5,5 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.googleService) apply false
     alias(libs.plugins.crashlytics) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
 }

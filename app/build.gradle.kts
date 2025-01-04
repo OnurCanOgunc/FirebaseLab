@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.googleService)
     alias(libs.plugins.crashlytics)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -64,5 +65,6 @@ dependencies {
     implementation(libs.firebase.auth)
 
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 
 }
