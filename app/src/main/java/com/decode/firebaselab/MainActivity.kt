@@ -10,23 +10,43 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.decode.firebaselab.ui.theme.FirebaseLabTheme
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
+    private lateinit var auth: FirebaseAuth
+    private lateinit var navController: NavHostController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth = Firebase.auth
         enableEdgeToEdge()
         setContent {
-            val navController = rememberNavController()
+            navController = rememberNavController()
             FirebaseLabTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     AppNavigation(
                         navController = navController,
+                        auth = auth,
                         modifier = Modifier.padding(innerPadding)
                     )
+                }
+            }
+            val currentUser = auth.currentUser
+            currentUser?.let {
+                LaunchedEffect(key1 = Unit) {
+                    navController.navigate(Screens.Home(currentUser.displayName ?: "")) {
+                        popUpTo(navController.graph.id) {
+                            inclusive = true
+                        }
+                    }
+                    //auth.signOut()
                 }
             }
         }
