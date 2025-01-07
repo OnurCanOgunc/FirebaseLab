@@ -53,7 +53,6 @@ fun AuthScreen(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(Color.Transparent, black),
-                        // Karartmanın başladığı noktayı ayarlayın
                     )
                 )
         )
