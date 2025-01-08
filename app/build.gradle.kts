@@ -1,4 +1,5 @@
 import org.gradle.internal.impldep.org.jsoup.nodes.Entities.EscapeMode.extended
+import org.jetbrains.kotlin.konan.properties.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -11,16 +12,20 @@ plugins {
 
 android {
     namespace = "com.decode.firebaselab"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.decode.firebaselab"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        buildConfigField("String", "WEB_CLIENT_ID", properties.getProperty("WEB_CLIENT_ID"))
     }
 
     buildTypes {
@@ -40,6 +45,7 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
@@ -65,6 +71,10 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.auth)
+    implementation(libs.play.services.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.googleid)
+    implementation(libs.androidx.credentials.play.services.auth)
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
