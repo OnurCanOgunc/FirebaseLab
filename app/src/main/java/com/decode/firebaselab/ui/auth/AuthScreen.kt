@@ -17,6 +17,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -29,17 +30,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.decode.firebaselab.R
+import com.decode.firebaselab.data.auth.AuthResponse
+import com.decode.firebaselab.data.auth.AuthenticationManager
 import com.decode.firebaselab.ui.auth.component.CustomButton
 import com.decode.firebaselab.ui.theme.black
 import com.decode.firebaselab.ui.theme.black2
 import com.decode.firebaselab.ui.theme.green
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @Composable
 fun AuthScreen(
     modifier: Modifier = Modifier,
+    authManager: AuthenticationManager,
     navigateToLogin: () -> Unit = {},
-    navigateToSignUp: () -> Unit = {}
+    navigateToSignUp: () -> Unit = {},
+    navigateToHome: () -> Unit = {}
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     Box(modifier = modifier.fillMaxSize()) {
         Image(
             modifier = Modifier.fillMaxSize(),
@@ -96,12 +105,18 @@ fun AuthScreen(
                 )
             }
             CustomButton(
-                modifier = Modifier.clickable {  },
+                modifier = Modifier.clickable {
+                    authManager.signInWithGoogle().onEach { response ->
+                        if (response is AuthResponse.Success) {
+                            navigateToHome()
+                        }
+                    }.launchIn(coroutineScope)
+                },
                 title = "Continue with Google",
                 painter = painterResource(R.drawable.google)
             )
             CustomButton(
-                modifier = Modifier.clickable {  },
+                modifier = Modifier.clickable {},
                 title = "Continue with Facebook",
                 painter = painterResource(R.drawable.facebook)
             )
@@ -121,5 +136,5 @@ fun AuthScreen(
 @Composable
 @Preview(showBackground = true)
 fun AuthScreenPreview(modifier: Modifier = Modifier) {
-    AuthScreen(modifier)
+    //AuthScreen(modifier)
 }

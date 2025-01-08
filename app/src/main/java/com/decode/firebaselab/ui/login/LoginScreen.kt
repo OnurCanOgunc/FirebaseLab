@@ -39,24 +39,31 @@ import androidx.compose.ui.unit.sp
 import com.decode.firebaselab.ui.theme.black
 import com.decode.firebaselab.ui.theme.black2
 import com.decode.firebaselab.ui.theme.green
-import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.decode.firebaselab.R
+import com.decode.firebaselab.data.auth.AuthResponse
+import com.decode.firebaselab.data.auth.AuthenticationManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    auth: FirebaseAuth,
-    navigateToAuth: () -> Unit = {}
+    authManager: AuthenticationManager,
+    navigateToAuth: () -> Unit = {},
+    navigateToHome: () -> Unit = {}
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = modifier
@@ -116,7 +123,10 @@ fun LoginScreen(
                 label = { Text("Enter Email") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White,unfocusedTextColor = Color.White)
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White
+                )
 
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -136,20 +146,16 @@ fun LoginScreen(
                         )
                     }
                 },
-                colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White,unfocusedTextColor = Color.White)
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White
+                )
             )
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
-                    auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
-                        if (it.isSuccessful) {
-                            Log.d("Login", "Login successful")
-                        }
-                        else {
-                            Log.d("Login", "Login failed")
-                        }
-                    }
+                    handleLogin(email, password, authManager, navigateToHome, coroutineScope)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -159,5 +165,28 @@ fun LoginScreen(
                 Text("Login")
             }
         }
+    }
+}
+
+private fun handleLogin(
+    email: String,
+    password: String,
+    authManager: AuthenticationManager,
+    navigateToHome: () -> Unit,
+    coroutineScope: CoroutineScope
+) {
+    if (email.isNotBlank() && password.isNotBlank()) {
+        authManager.loginWithEmailAndPassword(email, password)
+            .onEach { response ->
+                when (response) {
+                    is AuthResponse.Success -> navigateToHome()
+                    is AuthResponse.Failure -> {
+                        Log.e("Login", response.message)
+                    }
+                }
+            }
+            .launchIn(coroutineScope)
+    } else {
+        Log.e("SignUp", "Email or password cannot be empty.")
     }
 }

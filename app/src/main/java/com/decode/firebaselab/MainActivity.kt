@@ -15,17 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.decode.firebaselab.data.auth.AuthenticationManager
 import com.decode.firebaselab.ui.theme.FirebaseLabTheme
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
-    private lateinit var auth: FirebaseAuth
+    private val authenticationManager by lazy { AuthenticationManager(this) }
     private lateinit var navController: NavHostController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        auth = Firebase.auth
+        val auth = authenticationManager.auth
         enableEdgeToEdge()
         setContent {
             navController = rememberNavController()
@@ -33,7 +31,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     AppNavigation(
                         navController = navController,
-                        auth = auth,
+                        authenticationManager = authenticationManager,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -46,12 +44,13 @@ class MainActivity : ComponentActivity() {
                             inclusive = true
                         }
                     }
-                    //auth.signOut()
+                    auth.signOut()
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {

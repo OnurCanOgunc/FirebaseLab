@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,22 +44,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.decode.firebaselab.R
+import com.decode.firebaselab.data.auth.AuthResponse
+import com.decode.firebaselab.data.auth.AuthenticationManager
 import com.decode.firebaselab.ui.theme.black
 import com.decode.firebaselab.ui.theme.black2
 import com.decode.firebaselab.ui.theme.green
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserProfileChangeRequest
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
-    auth: FirebaseAuth,
-    navigateToAuth: () -> Unit = {}
+    authManager: AuthenticationManager,
+    navigateToAuth: () -> Unit = {},
+    navigateToHome: (name: String) -> Unit = {}
 ) {
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = modifier
@@ -162,7 +168,9 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { registerUser(auth, email, password, fullName) },
+                onClick = {
+                    handleRegistration(fullName,email, password, authManager, navigateToHome, coroutineScope)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
@@ -174,29 +182,25 @@ fun SignUpScreen(
     }
 }
 
-fun registerUser(auth: FirebaseAuth, email: String, password: String, fullName: String) {
+private fun handleRegistration(
+    fullName: String,
+    email: String,
+    password: String,
+    authManager: AuthenticationManager,
+    navigateToHome: (name: String) -> Unit,
+    coroutineScope: CoroutineScope
+) {
     if (email.isNotBlank() && password.isNotBlank()) {
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val profileUpdate = UserProfileChangeRequest.Builder()
-                    .setDisplayName(fullName)
-                    .build()
-                auth.currentUser?.updateProfile(profileUpdate)
-                    ?.addOnCompleteListener { updateTask ->
-                        if (updateTask.isSuccessful) {
-                            Log.d("SignUp", "User profile updated successfully.")
-                        } else {
-                            Log.e(
-                                "SignUp",
-                                "User profile update failed: ${updateTask.exception?.message}"
-                            )
-                        }
+        authManager.createAccountWithEmailAndPassword(fullName,email, password)
+            .onEach { response ->
+                when (response) {
+                    is AuthResponse.Success -> navigateToHome(fullName)
+                    is AuthResponse.Failure -> {
+                        Log.e("Login", response.message)
                     }
-                Log.d("SignUp", "User created successfully.")
-            } else {
-                Log.e("SignUp", "User creation failed: ${task.exception?.message}")
+                }
             }
-        }
+            .launchIn(coroutineScope)
     } else {
         Log.e("SignUp", "Email or password cannot be empty.")
     }

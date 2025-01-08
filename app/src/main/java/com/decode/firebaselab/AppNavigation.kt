@@ -6,31 +6,39 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.decode.firebaselab.data.auth.AuthenticationManager
 import com.decode.firebaselab.ui.auth.AuthScreen
 import com.decode.firebaselab.ui.home.HomeScreen
 import com.decode.firebaselab.ui.login.LoginScreen
 import com.decode.firebaselab.ui.signup.SignUpScreen
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.serialization.Serializable
 
 @Composable
 fun AppNavigation(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    auth: FirebaseAuth
+    authenticationManager: AuthenticationManager
 ) {
     NavHost(navController = navController, startDestination = Screens.Auth, modifier = modifier) {
         composable<Screens.Auth> {
             AuthScreen(
+                authManager = authenticationManager,
                 navigateToLogin = { navController.navigate(Screens.Login) },
-                navigateToSignUp = { navController.navigate(Screens.SignUp) }
+                navigateToSignUp = { navController.navigate(Screens.SignUp) },
+                navigateToHome = { navController.navigate(Screens.Home("Home")) }
             )
         }
         composable<Screens.Login> {
-            LoginScreen(auth = auth, navigateToAuth = { navController.navigate(Screens.Auth)})
+            LoginScreen(
+                authManager = authenticationManager,
+                navigateToAuth = { navController.navigate(Screens.Auth) },
+                navigateToHome = { navController.navigate(Screens.Home("Home")) })
         }
         composable<Screens.SignUp> {
-            SignUpScreen(auth = auth, navigateToAuth = { navController.navigate(Screens.Auth)})
+            SignUpScreen(
+                authManager = authenticationManager,
+                navigateToAuth = { navController.navigate(Screens.Auth) },
+                navigateToHome = { navController.navigate(Screens.Home(it)) })
         }
         composable<Screens.Home> { backStackEntry ->
             val argument = backStackEntry.toRoute<Screens.Home>()
