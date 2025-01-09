@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.googleid)
     implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.firebase.firestore)
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
