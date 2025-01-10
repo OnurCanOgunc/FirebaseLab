@@ -1,5 +1,6 @@
 [versions]
 agp = "8.7.3"
+foundation = "1.8.0-alpha07"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -18,9 +19,11 @@ materialIconsExtended = "1.7.6"
 credentials = "1.5.0-beta01"
 googleid = "1.1.1"
 credentialsPlayServicesAuth = "1.5.0-beta01"
+coil = "2.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "foundation" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -45,6 +48,7 @@ androidx-credentials = { group = "androidx.credentials", name = "credentials", v
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentialsPlayServicesAuth" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+coil = {module = "io.coil-kt:coil-compose", version.ref = "coil"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
