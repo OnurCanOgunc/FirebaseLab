@@ -7,8 +7,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.decode.firebaselab.data.auth.AuthenticationManager
+import com.decode.firebaselab.data.db.DataManager
 import com.decode.firebaselab.ui.auth.AuthScreen
 import com.decode.firebaselab.ui.home.HomeScreen
+import com.decode.firebaselab.ui.home.HomeViewModel
 import com.decode.firebaselab.ui.login.LoginScreen
 import com.decode.firebaselab.ui.signup.SignUpScreen
 import kotlinx.serialization.Serializable
@@ -17,7 +19,8 @@ import kotlinx.serialization.Serializable
 fun AppNavigation(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    authenticationManager: AuthenticationManager
+    authenticationManager: AuthenticationManager,
+    dataManager: DataManager
 ) {
     NavHost(navController = navController, startDestination = Screens.Auth, modifier = modifier) {
         composable<Screens.Auth> {
@@ -42,7 +45,8 @@ fun AppNavigation(
         }
         composable<Screens.Home> { backStackEntry ->
             val argument = backStackEntry.toRoute<Screens.Home>()
-            HomeScreen(name = argument.name)
+            val viewModel = HomeViewModel(dataManager = dataManager)
+            HomeScreen(name = argument.name, homeViewModel = viewModel)
         }
     }
 }

@@ -10,20 +10,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.decode.firebaselab.data.auth.AuthenticationManager
+import com.decode.firebaselab.data.db.DataManager
 import com.decode.firebaselab.ui.theme.FirebaseLabTheme
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
     private val authenticationManager by lazy { AuthenticationManager(this) }
+    private val DataManager by lazy { DataManager(Firebase.firestore) }
     private lateinit var navController: NavHostController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val auth = authenticationManager.auth
         enableEdgeToEdge()
         setContent {
             navController = rememberNavController()
@@ -32,22 +34,24 @@ class MainActivity : ComponentActivity() {
                     AppNavigation(
                         navController = navController,
                         authenticationManager = authenticationManager,
+                        dataManager = DataManager,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
-            val currentUser = auth.currentUser
-            currentUser?.let {
-                LaunchedEffect(key1 = Unit) {
-                    navController.navigate(Screens.Home(currentUser.displayName ?: "")) {
-                        popUpTo(navController.graph.id) {
-                            inclusive = true
-                        }
-                    }
-                    auth.signOut()
-                }
-            }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val currentUser = authenticationManager.auth.currentUser
+//        currentUser?.let {
+//            navController.navigate(Screens.Home(currentUser.displayName ?: "")) {
+//                popUpTo(navController.graph.id) {
+//                    inclusive = true
+//                }
+//            }
+//        }
     }
 }
 
