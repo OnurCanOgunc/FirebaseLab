@@ -48,6 +48,7 @@ androidx-credentials = { group = "androidx.credentials", name = "credentials", v
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentialsPlayServicesAuth" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+firebase-config = { module = "com.google.firebase:firebase-config-ktx" }
 coil = {module = "io.coil-kt:coil-compose", version.ref = "coil"}
 
 [plugins]
